@@ -1,4 +1,6 @@
 import networkx as nx
+import itertools
+import re
 import matplotlib.pyplot as plt
 
 def display_permutation_graph(n, perm_string):
@@ -21,7 +23,7 @@ def display_permutation_graph(n, perm_string):
     for i in range(n):
         G.add_edge(i+1, perm[i])
     pos = nx.spring_layout(G,k=1.5)
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(8, 5))
     
     # draw graph
     nx.draw(G, pos, 
@@ -74,5 +76,24 @@ def get_canonical_notation(cycles):
     
     return result if result else "()"
 
-# test usage
-display_permutation_graph(7, "3275461")
+def normalize_string(s):
+    return re.sub(r'[\(\),\s]', '', s)
+
+
+def find_matching_permutations(n):
+    all_perms = itertools.permutations(range(1, n+1))
+    
+    matching_perms = []
+    
+    for perm in all_perms:
+        perm_string = ''.join(map(str, perm))
+        perm_cycles = get_cycles(n, perm_string)
+        perm_canonical = get_canonical_notation(perm_cycles)
+        perm_normalized = normalize_string(perm_canonical)
+        
+        if perm_normalized == perm_string:
+            matching_perms.append(perm_string)
+    
+    return matching_perms
+
+print(find_matching_permutations(4))
